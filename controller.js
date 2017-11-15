@@ -1,4 +1,4 @@
-var canvas, ctx, WIDTH, HEIGHT, FPS, tileSize;
+var canvas, ctx, WIDTH, HEIGHT, FPS, tileSize, playing;
 var snake;
 
 window.addEventListener("resize", resizeWindow);
@@ -33,6 +33,8 @@ function init() {
 function newGame() {
 
 	snake = new Snake();
+
+	playing = false;
 	
 }
 
@@ -45,6 +47,21 @@ function Snake() {
 	this.update = function() {
 
 		var nextPos = [this.body[0][0] + this.direction[0], this.body[0][1] + this.direction[1]];
+
+		if (!playing) {
+			if (this.direction[1] == -1 && nextPos[1] <= (HEIGHT * 0.1 / tileSize))
+				this.direction = [1, 0];
+
+			else if (this.direction[0] == 1 && nextPos[0] >= (WIDTH * 0.9 / tileSize))
+				this.direction = [0, 1];
+
+			else if (this.direction[1] == 1 && nextPos[1] >= (HEIGHT * 0.9 / tileSize))
+				this.direction = [-1, 0];
+
+			else if (this.direction[0] == -1 && nextPos[0] <= (WIDTH * 0.1 / tileSize))
+				this.direction = [0, -1];
+		
+		}
 
 		this.body.pop();
 		this.body.splice(0, 0, nextPos);
