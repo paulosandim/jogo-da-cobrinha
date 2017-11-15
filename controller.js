@@ -40,6 +40,16 @@ function Snake() {
 
 	this.body = [[10, 10], [10, 11], [10, 12]];
 	this.color = "#000";
+	this.direction = [0, -1];
+
+	this.update = function() {
+
+		var nextPos = [this.body[0][0] + this.direction[0], this.body[0][1] + this.direction[1]];
+
+		this.body.pop();
+		this.body.splice(0, 0, nextPos);
+
+	}
 
 	this.draw = function() {
 		ctx.fillStyle = this.color;
@@ -53,6 +63,7 @@ function Snake() {
 
 function update() {
 
+	snake.update();
 
 }
 
