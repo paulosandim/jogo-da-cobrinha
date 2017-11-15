@@ -1,2 +1,48 @@
-Teste
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>Snake</title>
+</head>
+<body>
+<script>
 
+	var canvas, ctx, WIDTH, HEIGHT, FPS;
+
+	function init() {
+
+		canvas = document.createElement("canvas");
+		canvas.width = 600;
+		canvas.height = 600;
+
+		document.body.appendChild(canvas);
+		ctx = canvas.getContext("2d");
+
+		FPS = 15;
+
+		run(); 
+
+	}
+
+	function update() {
+
+		console.log("a");
+
+	}
+
+	function run() {
+
+		update();
+		draw();
+
+		setTimeout(run, 1000 / FPS);
+
+	}
+
+	function draw() {}
+
+	init();
+	
+</script>
+</body>
+</html>
