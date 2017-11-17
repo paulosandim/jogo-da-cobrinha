@@ -1,6 +1,7 @@
 var canvas, ctx, WIDTH, HEIGHT, FPS, tileSize, playing;
-var snake;
+var snake, playLabel;
 var globalTouch = [], offset = [];
+
 
 
 var keys = {
@@ -86,6 +87,12 @@ function resizeWindow() {
 
 }
 
+function isMobileDevice() {
+	
+	return /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent)
+
+}
+
 function init() {
 
 	canvas = document.createElement("canvas");
@@ -105,8 +112,39 @@ function newGame() {
 
 	snake = new Snake();
 
+	playLabel = new PlayLabel();
+
 	playing = false;
 	
+}
+
+function PlayLabel() {
+	
+	this.text;
+	this.color = "#5d8357"
+
+	this.messages = {
+
+		portrait: "Rotacione o dispositivo para jogar", 
+		landscape: "Arraste a tela para jogar",
+		pc: "Pressione as setas para jogar"
+
+	};
+
+	if (isMobileDevice()) {
+
+	} else {
+
+		this.text = this.messages["pc"];
+
+	}
+
+	this.draw = function() {
+
+		ctx.fillStyle = this.color;
+		ctx.font = tileSize * 2 + "px Arial";
+		ctx.fillText(this.text, WIDTH / 2 - ctx.measureText(this.text).width /2, HEIGHT / 2);
+	}
 }
 
 function Snake() {
@@ -175,7 +213,10 @@ function draw() {
 
 	ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-		snake.draw();
+	snake.draw();
+
+	if (!playing)
+		playLabel.draw();
 	
 }
 
