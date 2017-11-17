@@ -1,7 +1,38 @@
 var canvas, ctx, WIDTH, HEIGHT, FPS, tileSize, playing;
 var snake;
 
+var keys = {
+
+	left: 37,
+	up: 38,
+	right: 39,
+	down: 40
+
+};
+
+window.addEventListener("keydown", keyDown);
 window.addEventListener("resize", resizeWindow);
+
+function keyDown(e) {
+
+	switch (e.keyCode) {
+		case keys.left:
+			snake.direction = [-1, 0];
+			break;
+
+		case keys.up:
+			snake.direction = [0, -1];
+			break;
+
+		case keys.right:
+			snake.direction = [1, 0];
+			break;
+
+		case keys.down:
+			snake.direction = [0, 1];
+			break; 
+	} 
+}
 
 function resizeWindow() {
 
