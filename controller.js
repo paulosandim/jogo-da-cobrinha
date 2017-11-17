@@ -1,5 +1,7 @@
 var canvas, ctx, WIDTH, HEIGHT, FPS, tileSize, playing;
 var snake;
+var globalTouch = [], offset = [];
+
 
 var keys = {
 
@@ -10,8 +12,42 @@ var keys = {
 
 };
 
+window.addEventListener("touchstart", touchStart);
+
+window.addEventListener("touchmove", touchMove);
+
+window.addEventListener("touchend", touchEnd);
+
 window.addEventListener("keydown", keyDown);
+
 window.addEventListener("resize", resizeWindow);
+
+function touchEnd(e) {
+
+	if (Math.abs(offset[0]) > Math.abs(offset[1]))
+		snake.direction = [offset[0] / Math.abs(offset[0]), 0];
+
+	else
+		snake.direction = [0, offset[1] / Math.abs(offset[1])];
+
+}
+
+function touchMove(e) {
+
+	var touch = e.touches[0];
+
+	offset = [touch.pageX - globalTouch[0], touch.pageY - globalTouch[1]];
+
+}
+
+function touchStart(e) {
+
+	e.preventDefault();
+
+	var touch = e.touches[0];
+	globalTouch = [touch.pageX, touch.pageY];
+
+}
 
 function keyDown(e) {
 

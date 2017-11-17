@@ -1,3 +1,12 @@
+html, body {
+
+	background: #ccccff;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+
+}
+
 canvas {
 
 			background: #ccccff;
