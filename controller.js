@@ -1,5 +1,5 @@
-var canvas, ctx, WIDTH, HEIGHT, FPS, tileSize, playing;
-var snake, playLabel;
+var canvas, ctx, WIDTH, HEIGHT, FPS = 15, tileSize, running, playing;
+var snake, food, playLabel;
 var globalTouch = [], offset = [];
 
 
@@ -21,7 +21,18 @@ window.addEventListener("touchend", touchEnd);
 
 window.addEventListener("keydown", keyDown);
 
+window.addEventListener("orientationchange", changeOrientation);
+
 window.addEventListener("resize", resizeWindow);
+
+function isLandscape() {
+
+	if (screen.orientation)
+
+		return(screen.orientation.type == "landscape-primary" || screen.orientation.type == "landscape-secondary");
+
+	return(WIDTH > HEIGHT);
+}
 
 function touchEnd(e) {
 
@@ -87,30 +98,25 @@ function resizeWindow() {
 
 }
 
-function isMobileDevice() {
-	
-	return /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent)
-
-}
-
 function init() {
-
+	
 	canvas = document.createElement("canvas");
-	resizeWindow();
-		
-	document.body.appendChild(canvas);
+	document.body.appendChild(canvas);	
 	ctx = canvas.getContext("2d");
 
-	FPS = 15;
+	running = true;
+	resize();
 
 	newGame();
-	run(); 
-	
+
+	requestAnimationFrame(run);
 }
 
 function newGame() {
 
 	snake = new Snake();
+
+	food = new Food();
 
 	playLabel = new PlayLabel();
 
@@ -120,8 +126,10 @@ function newGame() {
 
 function PlayLabel() {
 	
+	this.factor = 1.5;
 	this.text;
-	this.color = "#5d8357"
+	this.color = "#5d8357";
+	this.font = tileSize * this.factor + "pt Arial";
 
 	this.messages = {
 
@@ -131,19 +139,66 @@ function PlayLabel() {
 
 	};
 
-	if (isMobileDevice()) {
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+				
+	if (!isLandscape())		
+		this.text = this.messages["portrait"];
 
-	} else {
+	else		
+		this.text = this.messages["landscape"];
 
-		this.text = this.messages["pc"];
+}
+				
+else
+	this.text = this.messages["pc"];
+			
 
+	this.setText = function(key) {
+		this.text = this.messages[key];
+		
+	}
+
+	this.update = function() {	
+		this.font = tileSize * this.factor + "pt Arial";
+	
 	}
 
 	this.draw = function() {
 
 		ctx.fillStyle = this.color;
-		ctx.font = tileSize * 2 + "px Arial";
-		ctx.fillText(this.text, WIDTH / 2 - ctx.measureText(this.text).width /2, HEIGHT / 2);
+		ctx.font = this.font;
+		ctx.fillText(this.text, WIDTH / 2 - (ctx.measureText(this.text).width / 2), HEIGHT / 2);
+	
+	}
+
+}
+
+function changeOrientation(e) {
+
+	resizeWindow();
+
+	if (isLandscape())
+		playLabel.setText("landscape");
+
+	else if (!playing) {
+		playLabel.setText("portrait");
+	}
+
+	else {
+
+		playing = false;
+		playLabel.setText("portrait");
+	}
+}
+
+function Food() {
+	
+	this.color = "#ff0000",
+	this.position = [Math.floor(Math.random() * (WIDTH / tileSize)), Math.floor(Math.random() * (HEIGHT / tileSize))];
+
+	for (var i = 0; i < snake.body.length; i++) {
+		while (this.position[0] == snake.body[i][0] && this.position[1] == snake.body[i][1])
+			this.position = [Math.floor(Math.random() * (WIDTH / tileSize)), Math.floor(Math.random() * (HEIGHT / tileSize))];
 	}
 }
 
@@ -198,14 +253,46 @@ function update() {
 
 	snake.update();
 
+	playLabel.update();
+
+	// se a cobrinha bater nela mesmo
+	for (var i = 1; i < snake.body.length; i++) {
+		if (snake.body[0][0] == snake.body[i][0] && snake.body[0][1] == snake.body[i][1])
+			newGame();
+	}
+
+	// se a cobrinha bater nos cantos
+	if (snake.body[0][0] < 0 || snake.body[0][0] * tileSize > WIDTH || snake.body[0][1] < 0 || snake.body[0][1] * tileSize > HEIGHT) 
+				newGame();
+			
+	// se a cobrinha comer a comida
+	if (snake.body[0][0] == food.position[0] && snake.body[0][1] == food.position[1]) {
+		snake.body.splice(snake.body.length - 1, 0, [snake.body[snake.body.length - 1]]);
+		food = new Food();
+	
+	}
+
 }
 
-function run() {
+function run(time) {
+	
+	dt = time - lastTime;
+	lastTime = time;
 
-	update();
-	draw();
+	if (running) {
+		
+		lag += dt;
 
-	setTimeout(run, 1000 / FPS);
+	while (lag >= 1000 / FPS) { 
+		update();
+		lag -= 1000 / FPS;
+		
+		}
+	
+	}
+
+	draw();	
+	requestAnimationFrame(run);
 
 }
 
@@ -214,6 +301,7 @@ function draw() {
 	ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
 	snake.draw();
+	food.draw();
 
 	if (!playing)
 		playLabel.draw();
