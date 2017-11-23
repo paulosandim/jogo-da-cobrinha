@@ -35,7 +35,7 @@ function isLandscape() {
 function PlayLabel() {
 			
 	this.factor = 1.5;
-	this.color = "#ccccff";
+	this.color = "#5D8357";
 	this.font = tileSize * this.factor + "pt Arial";
 	this.text;
 
